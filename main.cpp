@@ -1,113 +1,86 @@
-#include <windows.h>
 #include <iostream>
-#include <direct.h>
-#include <stdlib.h>
-#define ANCHO 60
-#define ALTO 25
-#define SECCIONES 5
-#define SECCIONES2 5
-
+#include <windows.h>
+#include <ctime>
+#define FILAS 5
+#define COLUMNAS 5
+#define ANCHO 12
+#define ALTO 4
 using namespace std;
-
 void gotoxy(int x, int y)
 {
-    HANDLE hCon;
-    hCon = GetStdHandle(STD_OUTPUT_HANDLE);
+    HANDLE hCon = GetStdHandle(STD_OUTPUT_HANDLE);
     COORD dwPos;
     dwPos.X = x;
     dwPos.Y = y;
     SetConsoleCursorPosition(hCon, dwPos);
 }
 
-void recuadro()
+void dibujarRecuadro(int x, int y, int ancho, int alto)
 {
-    for (int i = 0; i < ANCHO; i++)
-    {
-        gotoxy(i * 2, 0);
-        cout << char(220);
-        gotoxy(i * 2, ALTO);
+    gotoxy(x, y);
+    for (int i = 0; i <= ancho; i++) {
         cout << char(220);
     }
 
-    for (int i = 0; i <= ALTO; i++)
-    {
-        gotoxy(0, i);
-        cout << char(220);
-        gotoxy(ANCHO * 2 - 1, i);
+    gotoxy(x, y + alto);
+    for (int i = 0; i <= ancho; i++) {
         cout << char(220);
     }
+
+    for (int i = y + 1; i < y + alto; i++) {
+        gotoxy(x, i);
+        cout << char(179);
+
+        gotoxy(x + ancho, i);
+        cout << char(179);
+    }
+
+    gotoxy(x, y);
+    cout << char(220);
+
+    gotoxy(x + ancho, y);
+    cout << char(220);
+
+    gotoxy(x, y + alto);
+    cout << char(220);
+
+    gotoxy(x + ancho, y + alto);
+    cout << char(220);
 }
 
-void dibujarEje()
+void dibujarMatriz()
 {
-    for (int i = 0; i <= ANCHO * 2; i++)
-    {
-        gotoxy(i, 5);
-        cout << char(95);
-    }
-    for (int i = 0; i <= ANCHO * 2; i++)
-    {
-        gotoxy(i, 10);
-        cout << char(95);
-    }
-    for (int i = 0; i <= ANCHO * 2; i++)
-    {
-        gotoxy(i, 15);
-        cout << char(95);
-    }
-    for (int i = 0; i <= ANCHO * 2; i++)
-    {
-        gotoxy(i, 20);
-        cout << char(95);
+    int matriz[FILAS][COLUMNAS];
+    srand(time(0));
+
+    for (int i = 0; i < FILAS; i++) {
+        for (int j = 0; j < COLUMNAS; j++) {
+            matriz[i][j] = rand() % 100;
+        }
     }
 
-    int seccion = ANCHO / SECCIONES;
-    for (int i = 1; i < SECCIONES; i++)
-    {
-        int x = i * seccion * 2;
-        for (int j = 1; j < ALTO; j++)
-        {
-            gotoxy(x, j);
-            cout << char(179);
+    for (int i = 0; i < FILAS; i++) {
+        for (int j = 0; j < COLUMNAS; j++) {
+            int x = j * ANCHO;
+            int y = i * ALTO;
+
+            dibujarRecuadro(x, y, ANCHO, ALTO);
+            int centroX = x + (ANCHO / 2) - 1;
+            int centroY = y + (ALTO / 2);
+            gotoxy(centroX, centroY);
+
+            cout << matriz[i][j];
         }
     }
 }
 
 int main()
 {
-    system("cls");
-    system("color 40");
-    dibujarEje();
-    recuadro();
+    system("COLOR 2");
+    dibujarMatriz();
 
-    int casilla;
-    int seccions = ANCHO / SECCIONES;
-    char respuesta;
-
-
-    int fila;
-    int columna;
-
-    if (casilla <= SECCIONES)
-    {
-        fila = 1;
-        columna = (casilla - 1) * seccions * 2 + seccions;
-    }
-    else
-    {
-        fila = 2;
-        columna = (casilla - SECCIONES - 1) * seccions * 2 + seccions;
-    }
-
-    int y = fila * (ALTO / 2) - 1;
-
-    system("cls");
-    system("color 40");
-    dibujarEje();
-    recuadro();
-
-
-
+    int ultY = (FILAS - 1) * ALTO + ALTO;
+    gotoxy(0, ultY + 2);
 
     return 0;
 }
