@@ -135,7 +135,7 @@ int main()
     srand(time(0));
     int posX = 0;
     int posY = generarNumeroAleatorio(0, FILAS - 1);
-    string meta = "META";
+    string meta = "0";
     int metaX = COLUMNAS - 1;
     int metaY = generarNumeroAleatorio(0, FILAS - 1);
 
@@ -208,8 +208,6 @@ int main()
         }
 
         int resultado = calcularResultado(posX, posY, matriz);
-         gotoxy(0, ultY + 4);
-        cout << "Resultado: " << resultado << "      ";
         gotoxy(0, ultY + 1);
         cout << "Intentos restantes: " << 8 - intentos << "      ";
 
@@ -239,7 +237,7 @@ void instrucciones (){
     system ("COLOR B1");
 cout << "=== INSTRUCCIONES ===" << endl;
     cout << "Utiliza las teclas 'W'(Arriba) , 'A'(Izquierda), 'S'(Abajo) y 'D'(Derecha) para moverte en el juego." << endl;
-    cout << "El objetivo es llegar a la casilla marcada con 'META' en la ultima columna." << endl;
+    cout << "El objetivo es llegar a la casilla marcada con '0' (meta) en la ultima columna." << endl;
     cout << "En cada movimiento, se mostraran numeros alrededor de tu posicion actual." << endl;
     cout << "Debes calcular el resultado de la operacion e ingresar el valor correcto." << endl;
     cout << "Los calculos se realizan de la siguiente manera:" << endl;
@@ -255,10 +253,11 @@ cout << "=== INSTRUCCIONES ===" << endl;
     cout << "(3 + 8 + 5) * 2 = 32" << endl;
     cout << "Resultado = 72 - 32 = 40" << endl;
     cout << "Debes ingresar el valor correcto, en este caso, 40." << endl;
-    cout << "====================" << endl;
-    cout << "Presiona ENTER para iniciar el juego..." << endl;
-
-    cin.ignore();
-    system("cls");
+    cout << "Tienes 8 intentos para alcanzar la meta." << endl;
+    cout << "Buena suerte!" << endl;
+    cout << endl;
+    cout << "Presiona cualquier tecla para comenzar..." << endl;
+    getch();
 }
+
 
