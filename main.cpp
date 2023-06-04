@@ -1,11 +1,14 @@
 #include <iostream>
 #include <windows.h>
 #include <ctime>
+#include <cstdio>
+#include <conio.h>
 #define FILAS 5
 #define COLUMNAS 5
 #define ANCHO 12
 #define ALTO 4
 using namespace std;
+
 void gotoxy(int x, int y)
 {
     HANDLE hCon = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -48,14 +51,23 @@ void dibujarRecuadro(int x, int y, int ancho, int alto)
     cout << char(220);
 }
 
-void dibujarMatriz()
+int generarNumeroAleatorio(int min, int max)
+{
+    return min + rand() % (max - min + 1);
+}
+
+void dibujarMatriz(int posX, int posY)
 {
     int matriz[FILAS][COLUMNAS];
     srand(time(0));
 
     for (int i = 0; i < FILAS; i++) {
         for (int j = 0; j < COLUMNAS; j++) {
-            matriz[i][j] = rand() % 100;
+            if (j == posX && i == posY) {
+                matriz[i][j] = 1;
+            } else {
+                matriz[i][j] = generarNumeroAleatorio(1, 10);
+            }
         }
     }
 
@@ -69,7 +81,16 @@ void dibujarMatriz()
             int centroY = y + (ALTO / 2);
             gotoxy(centroX, centroY);
 
-            cout << matriz[i][j];
+            if (j == posX && i == posY) {
+                cout << ":)";
+                gotoxy(centroX, centroY + 1);
+            } else {
+                if (j >= posX - 1 && j <= posX + 1 && i >= posY - 1 && i <= posY + 1) {
+                    cout << matriz[i][j];
+                } else {
+                    cout << " ";
+                }
+            }
         }
     }
 }
@@ -77,11 +98,55 @@ void dibujarMatriz()
 int main()
 {
     system("COLOR 2");
-    dibujarMatriz();
+    int posX = 0;
+    int posY = FILAS - 1;
+    dibujarMatriz(posX, posY);
 
     int ultY = (FILAS - 1) * ALTO + ALTO;
     gotoxy(0, ultY + 2);
 
+    char movimiento;
+    do {
+        movimiento = getch();
+        switch (movimiento) {
+            case 'w':
+                if (posY > 0) {
+                    posY--;
+                    system("cls");
+                    dibujarMatriz(posX, posY);
+                    gotoxy(posX * ANCHO + (ANCHO / 2) - 1, posY * ALTO + (ALTO / 2) + 1);
+                }
+                break;
+            case 'a':
+                if (posX > 0) {
+                    posX--;
+                    system("cls");
+                    dibujarMatriz(posX, posY);
+                    gotoxy(posX * ANCHO + (ANCHO / 2) - 1, posY * ALTO + (ALTO / 2) + 1);
+                }
+                break;
+            case 's':
+                if (posY < FILAS - 1) {
+                    posY++;
+                    system("cls");
+                    dibujarMatriz(posX, posY);
+                    gotoxy(posX * ANCHO + (ANCHO / 2) - 1, posY * ALTO + (ALTO / 2) + 1);
+                }
+                break;
+            case 'd':
+                if (posX < COLUMNAS - 1) {
+                    posX++;
+                    system("cls");
+                    dibujarMatriz(posX, posY);
+                    gotoxy(posX * ANCHO + (ANCHO / 2) - 1, posY * ALTO + (ALTO / 2) + 1);
+                }
+                break;
+        }
+    } while (movimiento != 'q');
+
     return 0;
 }
+
+
+
 
