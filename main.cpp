@@ -88,24 +88,50 @@ void dibujarMatriz(int posX, int posY, const string& metaX, int metaY, int matri
 int calcularResultado(int posX, int posY, const int matriz[][COLUMNAS]) {
     int result = 0;
 
-    int numeroDerecha = matriz[posY][posX + 1];
-    int numeroIzquierda = matriz[posY][posX - 1];
-    if (posY > 0) {
-        result += (matriz[posY - 1][posX] + matriz[posY - 1][posX - 1] + matriz[posY - 1][posX + 1]) * numeroDerecha;
+    int numeroDerecha = 0;
+    if (posX < COLUMNAS - 1) {
+        numeroDerecha = matriz[posY][posX + 1];
     }
+
+    int numeroIzquierda = 0;
+    if (posX > 0) {
+        numeroIzquierda = matriz[posY][posX - 1];
+    }
+
+    if (posY > 0) {
+        int numeroArriba = matriz[posY - 1][posX];
+        int numeroArribaIzquierda = (posX > 0) ? matriz[posY - 1][posX - 1] : 0;
+        int numeroArribaDerecha = (posX < COLUMNAS - 1) ? matriz[posY - 1][posX + 1] : 0;
+        result += (numeroArriba + numeroArribaIzquierda + numeroArribaDerecha) * numeroDerecha;
+    }
+
     if (posY < FILAS - 1) {
-        result -= (matriz[posY + 1][posX] + matriz[posY + 1][posX - 1] + matriz[posY + 1][posX + 1]) * numeroIzquierda;
+        int numeroAbajo = matriz[posY + 1][posX];
+        int numeroAbajoIzquierda = (posX > 0) ? matriz[posY + 1][posX - 1] : 0;
+        int numeroAbajoDerecha = (posX < COLUMNAS - 1) ? matriz[posY + 1][posX + 1] : 0;
+        result -= (numeroAbajo + numeroAbajoIzquierda + numeroAbajoDerecha) * numeroIzquierda;
     }
 
     return result;
 }
 
-
-
-
+void generarNuevosNumerosAleatorios(int matriz[][COLUMNAS], int fila, int posX, int posY)
+{
+    for (int j = 0; j < COLUMNAS; j++) {
+        if (j == 0 || (fila == posY && j == posX)) {
+            matriz[fila][j] = generarNumeroAleatorio(1, 10);
+        } else {
+            matriz[fila][j] = generarNumeroAleatorio(1, 10);
+        }
+    }
+}
+void instrucciones ();
 int main()
 {
-    system("COLOR 2");
+
+    instrucciones ();
+    system ("COLOR 0B");
+    system("cls");
     srand(time(0));
     int posX = 0;
     int posY = generarNumeroAleatorio(0, FILAS - 1);
@@ -117,13 +143,7 @@ int main()
     int posInicialY = generarNumeroAleatorio(0, FILAS - 1);
 
     for (int i = 0; i < FILAS; i++) {
-        for (int j = 0; j < COLUMNAS; j++) {
-            if (j == 0) {
-                matriz[i][j] = (i == posInicialY) ? 1 : generarNumeroAleatorio(1, 10);
-            } else {
-                matriz[i][j] = generarNumeroAleatorio(1, 10);
-            }
-        }
+        generarNuevosNumerosAleatorios(matriz, i, posX, posY);
     }
 
     dibujarMatriz(posX, posY, meta, metaY, matriz);
@@ -133,47 +153,64 @@ int main()
 
     char movimiento;
     int intentos = 0;
+    bool movimientoValido = true;
     do {
         movimiento = getch();
         int posXAnterior = posX;
         int posYAnterior = posY;
 
+        movimientoValido = true;
+
         switch (movimiento) {
             case 'w':
                 if (posY > 0) {
                     posY--;
+                } else {
+                    movimientoValido = false;
                 }
                 break;
             case 'a':
                 if (posX > 0) {
                     posX--;
+                } else {
+                    movimientoValido = false;
                 }
                 break;
             case 's':
                 if (posY < FILAS - 1) {
                     posY++;
+                } else {
+                    movimientoValido = false;
                 }
                 break;
             case 'd':
                 if (posX < COLUMNAS - 1) {
                     posX++;
+                } else {
+                    movimientoValido = false;
                 }
                 break;
         }
 
+        if (!movimientoValido) {
+            continue;
+        }
+
         system("cls");
+        generarNuevosNumerosAleatorios(matriz, posYAnterior, posXAnterior, posY);
         dibujarMatriz(posX, posY, meta, metaY, matriz);
         gotoxy(posX * ANCHO + (ANCHO / 2) - 1, posY * ALTO + (ALTO / 2) + 1);
 
         if (posX == metaX && posY == metaY) {
-            cout << "¡Felicidades, has alcanzado la meta!";
+            gotoxy(0, ultY + 1);
+            cout << "¡Felicidades, has alcanzado la meta!" << endl;
             break;
         }
 
         int resultado = calcularResultado(posX, posY, matriz);
-        gotoxy(0, ultY + 4);
+         gotoxy(0, ultY + 4);
         cout << "Resultado: " << resultado << "      ";
-        gotoxy(0, ultY + 6);
+        gotoxy(0, ultY + 1);
         cout << "Intentos restantes: " << 8 - intentos << "      ";
 
         if (resultado != 0) {
@@ -182,22 +219,46 @@ int main()
             cin >> respuesta;
 
             if (respuesta == resultado) {
-                cout << "¡Respuesta correcta!" << endl;
+                cout << "¡Respuesta correcta! Ingresa la posicion a la que deseas moverte." << endl;
             } else {
-                cout << "Respuesta incorrecta." << endl;
+                cout << "Respuesta incorrecta. Presiona enter para regresar a la posición anterior." << endl;
                 posX = posXAnterior;
                 posY = posYAnterior;
-                intentos++;
             }
+            intentos++;
         }
-
-        intentos++;
-    } while (intentos < 8);
+    } while (intentos < 8 && movimientoValido);
 
     if (intentos == 8) {
-        cout << "¡Se acabaron los intentos! Game over.";
+        cout << "¡Se acabaron los intentos! Perdiste :(." << endl;
     }
 
     return 0;
+}
+void instrucciones (){
+    system ("COLOR B1");
+cout << "=== INSTRUCCIONES ===" << endl;
+    cout << "Utiliza las teclas 'W'(Arriba) , 'A'(Izquierda), 'S'(Abajo) y 'D'(Derecha) para moverte en el juego." << endl;
+    cout << "El objetivo es llegar a la casilla marcada con 'META' en la ultima columna." << endl;
+    cout << "En cada movimiento, se mostraran numeros alrededor de tu posicion actual." << endl;
+    cout << "Debes calcular el resultado de la operacion e ingresar el valor correcto." << endl;
+    cout << "Los calculos se realizan de la siguiente manera:" << endl;
+    cout << "1. Los tres numeros sobre el se suman y se multiplican por el numero de la derecha." << endl;
+    cout << "2. Los tres numeros de abajo se suman y se multiplican por el numero de la izquierda." << endl;
+    cout << "3. Los dos resultados de arriba se restan." << endl;
+    cout << "Por ejemplo, considera la siguiente situacion" << endl;
+    cout << "   7  4  1" << endl;
+    cout << "   2  :) 6" << endl;
+    cout << "   3  8  5" << endl;
+    cout << "Los calculos serian:" << endl;
+    cout << "(7 + 4 + 1) * 6 = 72" << endl;
+    cout << "(3 + 8 + 5) * 2 = 32" << endl;
+    cout << "Resultado = 72 - 32 = 40" << endl;
+    cout << "Debes ingresar el valor correcto, en este caso, 40." << endl;
+    cout << "====================" << endl;
+    cout << "Presiona ENTER para iniciar el juego..." << endl;
+
+    cin.ignore();
+    system("cls");
 }
 
