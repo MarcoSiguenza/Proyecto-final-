@@ -59,6 +59,7 @@ int generarNumeroAleatorio(int min, int max)
 
 void dibujarMatriz(int posX, int posY, const string& metaX, int metaY, int matriz[][COLUMNAS])
 {
+
     for (int i = 0; i < FILAS; i++) {
         for (int j = 0; j < COLUMNAS; j++) {
             int x = j * ANCHO;
@@ -73,7 +74,13 @@ void dibujarMatriz(int posX, int posY, const string& metaX, int metaY, int matri
                 cout << ":)";
                 gotoxy(centroX, centroY + 1);
             } else if (j == COLUMNAS - 1 && i == metaY) {
-                cout << metaX;
+                if (posX == COLUMNAS - 1 && posY == metaY) {
+                    cout << matriz[i][j];
+                } else if (posX >= COLUMNAS - 2 && posY >= metaY - 1 && posY <= metaY + 1) {
+                    cout << matriz[i][j];
+                } else {
+                    cout << metaX;
+                }
             } else {
                 if (j >= posX - 1 && j <= posX + 1 && i >= posY - 1 && i <= posY + 1 && !(j == posX && i == posY)) {
                     cout << matriz[i][j];
@@ -83,7 +90,11 @@ void dibujarMatriz(int posX, int posY, const string& metaX, int metaY, int matri
             }
         }
     }
+    gotoxy(0, (FILAS - 1) * ALTO + ALTO + 1);
+    cout<<"Presiona enter para empezar";
 }
+
+
 
 int calcularResultado(int posX, int posY, const int matriz[][COLUMNAS]) {
     int result = 0;
@@ -135,10 +146,9 @@ int main()
     srand(time(0));
     int posX = 0;
     int posY = generarNumeroAleatorio(0, FILAS - 1);
-    string meta = "0";
+    string meta = "META";
     int metaX = COLUMNAS - 1;
     int metaY = generarNumeroAleatorio(0, FILAS - 1);
-
     int matriz[FILAS][COLUMNAS];
     int posInicialY = generarNumeroAleatorio(0, FILAS - 1);
 
@@ -154,6 +164,7 @@ int main()
     char movimiento;
     int intentos = 0;
     bool movimientoValido = true;
+    bool primeraMovida = true;
     do {
         movimiento = getch();
         int posXAnterior = posX;
@@ -161,70 +172,112 @@ int main()
 
         movimientoValido = true;
 
-        switch (movimiento) {
-            case 'w':
-                if (posY > 0) {
-                    posY--;
-                } else {
-                    movimientoValido = false;
-                }
-                break;
-            case 'a':
-                if (posX > 0) {
-                    posX--;
-                } else {
-                    movimientoValido = false;
-                }
-                break;
-            case 's':
-                if (posY < FILAS - 1) {
-                    posY++;
-                } else {
-                    movimientoValido = false;
-                }
-                break;
-            case 'd':
-                if (posX < COLUMNAS - 1) {
-                    posX++;
-                } else {
-                    movimientoValido = false;
-                }
-                break;
-        }
+char primerMovimiento;
+char segundoMovimiento;
+gotoxy(0, ultY + 1);
+cout << "Ingresa tu primer movimiento (w/a/s/d): ";
+primerMovimiento = getch();
 
-        if (!movimientoValido) {
-            continue;
+switch (primerMovimiento) {
+    case 'w':
+        if (posY > 0) {
+            posY--;
         }
+        break;
+    case 'a':
+        if (posX > 0) {
+            posX--;
+        }
+        break;
+    case 's':
+        if (posY < FILAS - 1) {
+            posY++;
+        }
+        break;
+    case 'd':
+        if (posX < COLUMNAS - 1) {
+            posX++;
+        }
+        break;
+}
 
+system("cls");
+
+dibujarMatriz(posX, posY, meta, metaY, matriz);
+gotoxy(0, ultY + 1);
+cout << "Ingresa tu segundo movimiento (w/a/s/d): ";
+segundoMovimiento = getch();
+
+switch (segundoMovimiento) {
+    case 'w':
+        if (posY > 0) {
+            posY--;
+        }
+        break;
+    case 'a':
+        if (posX > 0) {
+            posX--;
+        }
+        break;
+    case 's':
+        if (posY < FILAS - 1) {
+            posY++;
+        }
+        break;
+    case 'd':
+        if (posX < COLUMNAS - 1) {
+            posX++;
+        }
+        break;
+}
+
+
+if (!movimientoValido) {
+    continue;
+}
+
+if (primeraMovida) {
+    meta = " ";
+    primeraMovida = false;
+}
+
+system("cls");
+generarNuevosNumerosAleatorios(matriz, posYAnterior, posXAnterior, posY);
+dibujarMatriz(posX, posY, meta, metaY, matriz);
+gotoxy(posX * ANCHO + (ANCHO / 2) - 1, posY * ALTO + (ALTO / 2) + 1);
+
+if (posX == metaX && posY == metaY) {
+    gotoxy(0, ultY + 1);
+    cout << "¡Felicidades, has alcanzado la meta!" << endl;
+    break;
+}
+
+int resultado = calcularResultado(posX, posY, matriz);
+gotoxy(0, ultY + 1);
+cout << "Intentos restantes: " << 8 - intentos << "      ";
+
+
+if (resultado != 0) {
+    int respuesta;
+    cout << "Ingrese su respuesta: ";
+    cin >> respuesta;
+
+    if (respuesta == resultado) {
+        cout << "¡Respuesta correcta! Presiona enter para ingresar otro movimiento" << endl;
+        intentos++;
+    } else {
+        cout << "Respuesta incorrecta. Presiona enter para regresar a la posición anterior." << endl;
+        posX = posXAnterior;
+        posY = posYAnterior;
+        getch();
         system("cls");
-        generarNuevosNumerosAleatorios(matriz, posYAnterior, posXAnterior, posY);
         dibujarMatriz(posX, posY, meta, metaY, matriz);
-        gotoxy(posX * ANCHO + (ANCHO / 2) - 1, posY * ALTO + (ALTO / 2) + 1);
+        continue;
+    }
+}
 
-        if (posX == metaX && posY == metaY) {
-            gotoxy(0, ultY + 1);
-            cout << "¡Felicidades, has alcanzado la meta!" << endl;
-            break;
-        }
+intentos++;
 
-        int resultado = calcularResultado(posX, posY, matriz);
-        gotoxy(0, ultY + 1);
-        cout << "Intentos restantes: " << 8 - intentos << "      ";
-
-        if (resultado != 0) {
-            int respuesta;
-            cout << "Ingrese su respuesta: ";
-            cin >> respuesta;
-
-            if (respuesta == resultado) {
-                cout << "¡Respuesta correcta! Ingresa la posicion a la que deseas moverte." << endl;
-            } else {
-                cout << "Respuesta incorrecta. Presiona enter para regresar a la posición anterior." << endl;
-                posX = posXAnterior;
-                posY = posYAnterior;
-            }
-            intentos++;
-        }
     } while (intentos < 8 && movimientoValido);
 
     if (intentos == 8) {
@@ -235,9 +288,9 @@ int main()
 }
 void instrucciones (){
     system ("COLOR B1");
-cout << "=== INSTRUCCIONES ===" << endl;
+    cout << "=== INSTRUCCIONES ===" << endl;
     cout << "Utiliza las teclas 'W'(Arriba) , 'A'(Izquierda), 'S'(Abajo) y 'D'(Derecha) para moverte en el juego." << endl;
-    cout << "El objetivo es llegar a la casilla marcada con '0' (meta) en la ultima columna." << endl;
+    cout << "El objetivo es llegar a la casilla marcada con 'META' (meta) en la ultima columna." << endl;
     cout << "En cada movimiento, se mostraran numeros alrededor de tu posicion actual." << endl;
     cout << "Debes calcular el resultado de la operacion e ingresar el valor correcto." << endl;
     cout << "Los calculos se realizan de la siguiente manera:" << endl;
@@ -251,13 +304,11 @@ cout << "=== INSTRUCCIONES ===" << endl;
     cout << "Los calculos serian:" << endl;
     cout << "(7 + 4 + 1) * 6 = 72" << endl;
     cout << "(3 + 8 + 5) * 2 = 32" << endl;
-    cout << "Resultado = 72 - 32 = 40" << endl;
-    cout << "Debes ingresar el valor correcto, en este caso, 40." << endl;
-    cout << "Tienes 8 intentos para alcanzar la meta." << endl;
-    cout << "Buena suerte!" << endl;
-    cout << endl;
-    cout << "Presiona cualquier tecla para comenzar..." << endl;
+    cout << "72 - 32 = 40" << endl;
+    cout << "Entonces, debes ingresar el valor '40'." << endl;
+    cout << "¡Buena suerte! Presiona cualquier tecla para dirigirte al juego." << endl;
+    cout << "NOTA: TIENES QUE MEMORIZAR LA META PORQUE DESPUES DEL SEGUNDO MOVIMIENTO LA PALABRA DESAPARECERA" << endl;
+    cout << "NOTA: SI LLEGASTE A LA META EN TU PRIMER MOVIMIENTO, SOLO PRESIONA ENTER" << endl;
     getch();
+    system("cls");
 }
-
-
